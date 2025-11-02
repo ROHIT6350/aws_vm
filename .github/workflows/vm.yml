@@ -1,0 +1,34 @@
+name: "Terrafrm aws vm"
+
+on: workflow_dispatch
+
+jobs:
+  terrafrom:
+    name: "terraform apply"
+    runs-on: ubuntu-latest
+
+    env:
+     AWS_ACCESS_KEY-ID: ${{ secrets.AWS-ACCESS_KET-ID }}
+     AWS_SECRET_ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+     -  name: checkout repository
+        uses: actions/checkout@v4
+
+     -  name: Install terrfrom manually
+        run: |
+          sudo apt update -y
+          sudo apt install -y wget unzip
+          wget https://releases.hashicorp.com/terrafrom/1.13.4/terrafrom_1.13.4_linux_amd64.zip
+          unzip terrafrom-1.13.4_linux_amd64.zip
+          sudo mv terrafrom /usr/local/bin/
+          terrafrom -version
+
+     - name: Terrafrom Init
+       run: terrafrom init
+     - name: Terrafrom validate
+       run: terrafrom validate
+     - name: terrafrom plan
+       run: terrafrom plan -var="aws_access_key=${AWS_ACCESS_KEY_ID" -var="aws_secret-key=${AWS_SECRET_ACCESS_KEY"
+     - name: terrafrom Apply
+       run: terrafrom apply -auto-approve -var="aws_access_key=${AWS_ACCESS_KEY_ID" -var="aws_secret_key:${AWS_SECRET_ACCESS_KEY}"      
